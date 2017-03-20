@@ -1,7 +1,7 @@
 #SingleInstance Force
 #Persistent
-#Include JSON.ahk
-#Include Gdip_All.ahk
+#Include lib/JSON.ahk
+#Include lib/Gdip_All.ahk
 
 poststring=http://poe.ninja/api/Data/GetCurrencyOverview?league=Legacy
 URLDownloadToFile,%poststring%, response.htm
@@ -16,7 +16,7 @@ for index, element in parsed.lines ; Recommended approach in most cases.
     ; Using "Loop", indices must be consecutive numbers from 1 to the number
     ; of elements in the array (or they must be calculated within the loop).
     ; MsgBox % "Element number " . A_Index . " is " . Array[A_Index]
-    
+
     ; Using "for", both the index (or "key") and its associated value
     ; are provided, and the index can be *any* value of your choosing.
 	test := RegExReplace(element.currencyTypeName,"[^\w]","_")
@@ -83,7 +83,7 @@ CreateTextForValue(xv,yv,value) {
 		value := 0
 	SetFormat, float, 3.1
 	Options = x%xv% y%yv% s15 r4 cbb999900
-	
+
 	Gdip_TextToGraphics(G, value, Options, Font, Width, Height)
 
 	UpdateLayeredWindow(hwnd1, hdc, (A_ScreenWidth-Width)//2, (A_ScreenHeight-Height)//2, Width, Height)
@@ -94,7 +94,7 @@ DrawTotal(xv,yv,value) {
 	SetFormat, float, 0.1
 	value = Total: %value%
 	Options = x%xv% y%yv% cbbFF9900
-	
+
 	Gdip_TextToGraphics(G, value, Options, Font, Width, Height)
 
 	UpdateLayeredWindow(hwnd1, hdc, (A_ScreenWidth-Width)//2, (A_ScreenHeight-Height)//2, Width, Height)
@@ -102,7 +102,7 @@ DrawTotal(xv,yv,value) {
 
 ProcessSlot(x,y, chaobs) {
 	MouseMove, x, y, 0
-	value := GetClipboardValue() 	
+	value := GetClipboardValue()
 	CreateTextForValue(x, y, value)
 	global chaos
 	chaos += value
@@ -110,68 +110,68 @@ ProcessSlot(x,y, chaobs) {
 
 ProcessSlotSingle() {
 	MouseGetPos, x, y
-	value := GetClipboardValue() 	
+	value := GetClipboardValue()
 	CreateTextForValue(x, y, value)
 }
 
 ProcessNormalTab() {
 	Gdip_GraphicsClear(G)
 	global chaos := 0
-	
+
 	offsetX = 42
 	offsetY = 188
-	
+
 	spacing = 52
-	
+
 	Data := Object()
-	
+
 	Loop 12
 	{
 	   y := A_Index
 	   Loop 12
 			ProcessSlot(offsetX + (A_Index-1)*spacing, offsetY + (y-1)*spacing, chaos)
 	}
-	
+
 	DrawTotal(540, 730, chaos)
 	StatsFile = %A_ScriptDir%\StatsFile.txt
-	
+
 	FormatTime, TimeString, Time, dddd MMMM d, yyyy hh:mm:ss tt
-	
+
 	FileAppend,  ; The comma is required in this case.
 	(
 		%TimeString% - Total Normal Chaos: %chaos% `n
 	), %StatsFile%
-	
+
 }
 
 ProcessQuadTab() {
 	Gdip_GraphicsClear(G)
 	global chaos := 0
-	
+
 	offsetX = 29
 	offsetY = 175
-	
+
 	spacing = 26
-	
+
 	Data := Object()
-	
+
 	Loop 24
 	{
 	   y := A_Index
 	   Loop 24
 			ProcessSlot(offsetX + (A_Index-1)*spacing, offsetY + (y-1)*spacing, chaos)
 	}
-	
+
 	DrawTotal(540, 730, chaos)
 	StatsFile = %A_ScriptDir%\StatsFile.txt
-	
+
 	FormatTime, TimeString, Time, dddd MMMM d, yyyy hh:mm:ss tt
-	
+
 	FileAppend,  ; The comma is required in this case.
 	(
 		%TimeString% - Total Quad Chaos: %chaos% `n
 	), %StatsFile%
-	
+
 }
 
 ProcessCurrencyTab() {
@@ -185,52 +185,52 @@ ProcessCurrencyTab() {
 	ProcessSlot(450, 255, chaos)
 	ProcessSlot(520, 255, chaos)
 	ProcessSlot(590, 255, chaos)
-	
+
 	ProcessSlot(70, 375, chaos)
 	ProcessSlot(140, 375, chaos)
 	ProcessSlot(210, 375, chaos)
 	ProcessSlot(450, 375, chaos)
 	ProcessSlot(520, 375, chaos)
 	ProcessSlot(590, 375, chaos)
-	
+
 	ProcessSlot(70, 450, chaos)
 	ProcessSlot(140, 450, chaos)
 	ProcessSlot(210, 450, chaos)
 	ProcessSlot(450, 450, chaos)
 	ProcessSlot(520, 450, chaos)
 	ProcessSlot(590, 450, chaos)
-	
+
 	ProcessSlot(295, 415, chaos)
 	ProcessSlot(365, 415, chaos)
-	
+
 	ProcessSlot(70, 550, chaos)
 	ProcessSlot(140, 550, chaos)
 	ProcessSlot(210, 550, chaos)
 	ProcessSlot(450, 550, chaos)
 	ProcessSlot(520, 550, chaos)
 	ProcessSlot(590, 550, chaos)
-	
+
 	ProcessSlot(210, 630, chaos)
 	ProcessSlot(450, 630, chaos)
 	ProcessSlot(520, 630, chaos)
 	ProcessSlot(590, 630, chaos)
-	
+
 	ProcessSlot(195, 730, chaos)
 	ProcessSlot(265, 730, chaos)
 	ProcessSlot(335, 730, chaos)
 	ProcessSlot(405, 730, chaos)
 	ProcessSlot(475, 730, chaos)
-	
+
 	DrawTotal(540, 730, chaos)
 	StatsFile = %A_ScriptDir%\StatsFile.txt
-	
+
 	FormatTime, TimeString, Time, dddd MMMM d, yyyy hh:mm:ss tt
-	
+
 	FileAppend,  ; The comma is required in this case.
 	(
 		%TimeString% - Total Chaos: %chaos% `n
 	), %StatsFile%
-	
+
 }
 
 GetClipboardValue() {
@@ -247,7 +247,7 @@ GetClipboardValue() {
 	   if(index == 1) {
 			name := RegExReplace(A_LoopField,"[^\w]","_")
 			if(name == "Chaos_Orb") {
-				chaosValue := 1.0	
+				chaosValue := 1.0
 			}else if(!name){
 				chaosValue := 0.0
 			}else {
@@ -257,7 +257,7 @@ GetClipboardValue() {
 		if(index == 3) {
 			stacksize := StringBetweenRE(A_LoopField,"Size: ", "/")
 			stacksize := RegExReplace(stacksize,"\.","")
-			
+
 			totalChaos += chaosValue * stacksize
 		}
 	   index++
